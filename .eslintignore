@@ -1,0 +1,9 @@
+build
+dist
+example-app
+android
+ios
+node_modules
+*.config.js
+*.config.cjs
+*.config.mjs

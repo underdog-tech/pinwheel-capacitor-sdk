@@ -1,0 +1,24 @@
+{
+  "originHash" : "97d56addd0abd1c51b01557bce89d1787d233169dafff9aca808f64f51930766",
+  "pins" : [
+    {
+      "identity" : "capacitor-swift-pm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ionic-team/capacitor-swift-pm.git",
+      "state" : {
+        "revision" : "596259033e94829dffc552a40e7129262122995e",
+        "version" : "8.0.0"
+      }
+    },
+    {
+      "identity" : "pinwheel-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/underdog-tech/pinwheel-ios-sdk",
+      "state" : {
+        "revision" : "b8de6fde69dfb2fd2f6471dc96c8cf49d819b759",
+        "version" : "3.5.0"
+      }
+    }
+  ],
+  "version" : 3
+}

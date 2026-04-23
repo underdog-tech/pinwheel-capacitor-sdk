@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+
+# iOS
+ios/Pods/
+ios/DerivedData/
+
+# Android
+android/.gradle/
+android/build/
+
