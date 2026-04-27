@@ -37,10 +37,23 @@ await Pinwheel.open({
 
 - Add `NSCameraUsageDescription` if you use flows that require camera access.
 - If you load non-HTTPS content (not recommended), configure ATS accordingly.
+- This wrapper requires **PinwheelSDK >= 3.5.0**, which implements the full
+  `PINWHEEL_INTERNAL_COMM_*` postMessage bridge needed for edge-native login flows.
 
 ## Android Notes
 
 - If you use camera flows, declare camera permission in your app manifest.
+- This wrapper requires **pinwheel-android >= 3.5.2**, which implements the full
+  `PINWHEEL_INTERNAL_COMM_*` postMessage bridge needed for edge-native login flows.
+
+## Edge native
+
+Edge-native is a Newton-driven login flow that runs in a native WebView controlled
+by the underlying `PinwheelSDK` / `pinwheel-android` library. Capacitor apps inherit
+edge-native support automatically via those native dependencies. The Capacitor
+wrapper identifies itself to Pinwheel Link as `sdk: "capacitor"` and forwards its
+own `package.json` version as `sdk_version`; Newton uses that pair to gate
+edge-native eligibility.
 
 ## Example app
 

@@ -8,6 +8,7 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
+import com.pinwheel.capacitor.BuildConfig
 import com.underdog_tech.pinwheel_android.PinwheelEventListener
 import com.underdog_tech.pinwheel_android.PinwheelFragment
 import com.underdog_tech.pinwheel_android.model.PinwheelAllocation
@@ -42,7 +43,12 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
 
         val useDarkMode = call.getBoolean("useDarkMode") ?: false
         val useSecureOrigin = call.getBoolean("useSecureOrigin") ?: false
-        val sdkVersion = call.getString("sdkVersion") ?: "0.0.1"
+        // The JS layer always passes the wrapper's `package.json` version via
+        // `Pinwheel.open()`. We fall back to `BuildConfig.WRAPPER_VERSION` (read at
+        // build time from package.json — see android/build.gradle) so the value
+        // forwarded to Pinwheel Link / Newton stays in sync with the published
+        // wrapper, never the legacy "0.0.1" / "unknown" placeholder.
+        val sdkVersion = call.getString("sdkVersion") ?: BuildConfig.WRAPPER_VERSION
 
         Handler(Looper.getMainLooper()).post {
             val activity = activity
@@ -52,14 +58,12 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
             }
 
             val fragmentManager = activity.supportFragmentManager
-            val tag = "PinwheelFragment"
-
-            fragmentManager.popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            fragmentManager.popBackStack(FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
             pinwheelFragment = PinwheelFragment.newInstanceWithAdvancedOptions(
                 token,
                 // Pinwheel Link validates this string strictly.
-                "android",
+                "capacitor",
                 sdkVersion,
                 null,
                 true,
@@ -70,8 +74,8 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
             }
 
             fragmentManager.beginTransaction()
-                .add(android.R.id.content, pinwheelFragment!!, tag)
-                .addToBackStack(tag)
+                .add(android.R.id.content, pinwheelFragment!!, FRAGMENT_TAG)
+                .addToBackStack(FRAGMENT_TAG)
                 .commit()
 
             call.resolve()
@@ -81,21 +85,40 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
     @PluginMethod
     fun close(call: PluginCall) {
         Handler(Looper.getMainLooper()).post {
-            val activity = activity
             if (activity == null) {
                 call.reject("No activity available")
                 return@post
             }
-
-            val fragmentManager = activity.supportFragmentManager
-            pinwheelFragment?.let { fragment ->
-                fragmentManager.beginTransaction()
-                    .remove(fragment)
-                    .commit()
-                pinwheelFragment = null
-            }
+            dismissFragment()
             call.resolve()
         }
+    }
+
+    override fun handleOnDestroy() {
+        // Capacitor lifecycle: ensure the fragment and its strong reference back to
+        // this plugin are released when the host activity is destroyed, so we don't
+        // leak the plugin (or the listener) across config changes / process kills.
+        // iOS gets equivalent cleanup automatically when the presented VC is
+        // dismissed and the delegate reference is dropped.
+        dismissFragment()
+        super.handleOnDestroy()
+    }
+
+    /**
+     * Pop the fragment off the back stack, clear the listener reference held by
+     * `PinwheelFragment` (which otherwise keeps this plugin alive indefinitely),
+     * and null our local reference. Safe to call multiple times.
+     */
+    private fun dismissFragment() {
+        val activity = activity ?: return
+        val fragmentManager = activity.supportFragmentManager
+        pinwheelFragment?.let { fragment ->
+            fragment.pinwheelEventListener = null
+        }
+        if (fragmentManager.findFragmentByTag(FRAGMENT_TAG) != null) {
+            fragmentManager.popBackStack(FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+        pinwheelFragment = null
     }
 
     override fun onEvent(eventName: PinwheelEventType, payload: PinwheelEventPayload?) {
@@ -127,12 +150,13 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
 
         if (name == "exit") {
             Handler(Looper.getMainLooper()).post {
-                pinwheelFragment?.let { fragment ->
-                    activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
-                    pinwheelFragment = null
-                }
+                dismissFragment()
             }
         }
+    }
+
+    private companion object {
+        private const val FRAGMENT_TAG = "PinwheelFragment"
     }
 }
 

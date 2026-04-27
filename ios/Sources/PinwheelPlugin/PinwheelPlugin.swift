@@ -25,7 +25,12 @@ public class PinwheelPlugin: CAPPlugin, CAPBridgedPlugin {
         let modeValue = call.getString("mode") ?? "sandbox"
         let environmentValue = call.getString("environment") ?? "staging"
         let linkURL = call.getString("linkURL")
-        let sdkVersion = call.getString("sdkVersion") ?? "0.0.1"
+        // The JS layer always passes the wrapper's `package.json` version via
+        // `Pinwheel.open()`. We fall back to the build-time constant from
+        // ios/Sources/PinwheelPlugin/Version.swift so the value forwarded to Pinwheel
+        // Link / Newton stays in sync with the published wrapper, never the legacy
+        // "0.0.1" placeholder.
+        let sdkVersion = call.getString("sdkVersion") ?? PinwheelCapacitorWrapper.version
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -48,7 +53,7 @@ public class PinwheelPlugin: CAPPlugin, CAPBridgedPlugin {
                 mode: mode,
                 environment: environment,
                 // Pinwheel Link validates this string strictly.
-                sdk: "ios",
+                sdk: "capacitor",
                 version: sdkVersion
             )
             config.useSecureOrigin = useSecureOrigin
