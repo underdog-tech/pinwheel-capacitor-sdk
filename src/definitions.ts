@@ -7,8 +7,14 @@ export interface PinwheelOpenOptions {
   linkToken: string;
 
   /**
-   * Wrapper version string forwarded to the native SDK for analytics/debugging.
-   * Defaults to the native plugin's built-in version if omitted.
+   * Version string for THIS Capacitor wrapper (i.e. `@pinwheel/capacitor-sdk`),
+   * forwarded to Pinwheel Link as `sdk_version` and used by Newton to gate
+   * edge-native eligibility. This is **not** the underlying native SDK version
+   * (PinwheelSDK on iOS, pinwheel-android on Android) — those are pinned in the
+   * podspec / Gradle build and are independent of this value.
+   *
+   * If omitted, the wrapper's `package.json` version is used automatically; you
+   * generally do not need to set this.
    */
   sdkVersion?: string;
 

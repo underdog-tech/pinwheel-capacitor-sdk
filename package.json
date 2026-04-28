@@ -1,6 +1,6 @@
 {
   "name": "@pinwheel/capacitor-sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Capacitor plugin wrapping the Pinwheel native SDKs (supports Capacitor 6, 7, and 8)",
   "type": "module",
   "main": "dist/cjs/index.js",
@@ -25,14 +25,15 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/write-cjs-package.mjs",
+    "write-version": "node scripts/write-version.mjs",
+    "build": "npm run clean && npm run write-version && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/write-cjs-package.mjs",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,tsx,js,mjs}\"",
     "sync-public": "bash scripts/update-external-repo/main.sh",
     "prepublishOnly": "npm run build",
-    "prepare": "husky"
+    "prepare": "husky && npm run write-version"
   },
   "keywords": [
     "capacitor",
