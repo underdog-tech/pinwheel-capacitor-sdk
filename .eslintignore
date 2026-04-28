@@ -1,0 +1,11 @@
+build
+dist
+example-app
+example-app-capacitor-6
+example-app-capacitor-7
+android
+ios
+node_modules
+*.config.js
+*.config.cjs
+*.config.mjs

@@ -1,0 +1,63 @@
+buildscript {
+    ext.kotlin_version = project.hasProperty('kotlin_version') ? rootProject.ext.kotlin_version : '1.9.25'
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+import groovy.json.JsonSlurper
+
+// Single source of truth for the wrapper version is `package.json`. Read it once at
+// configuration time so `BuildConfig.WRAPPER_VERSION` stays in sync with what the
+// TypeScript layer publishes (and matches the iOS podspec, which also reads from
+// package.json).
+def packageJson = new JsonSlurper().parse(file("${projectDir}/../package.json"))
+def wrapperVersion = packageJson.version
+
+android {
+    namespace 'com.pinwheel.capacitor'
+    compileSdk rootProject.ext.has('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 34
+
+    defaultConfig {
+        minSdk rootProject.ext.has('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
+        targetSdk rootProject.ext.has('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 34
+
+        buildConfigField "String", "WRAPPER_VERSION", "\"${wrapperVersion}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // pinwheel-android >= 3.5.2 implements the full PINWHEEL_INTERNAL_COMM_*
+    // edge-native postMessage bridge required by Pinwheel Link. Earlier versions are
+    // missing some event handlers (storage_get/_set, homer_open, auth_request) and
+    // would silently break edge-native flows.
+    implementation 'com.getpinwheel:pinwheel-android:3.5.2'
+    implementation project(':capacitor-android')
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.fragment:fragment-ktx:1.7.1'
+}

@@ -1,0 +1,110 @@
+version: 2.1
+
+# ---------------------------------------------------------------------------
+# Reusable references
+# ---------------------------------------------------------------------------
+references:
+  workspace: &workspace ~/src
+
+  restore_npm_cache: &restore_npm_cache
+    restore_cache:
+      key: npm-{{ checksum "package-lock.json" }}
+
+  save_npm_cache: &save_npm_cache
+    save_cache:
+      key: npm-{{ checksum "package-lock.json" }}
+      paths:
+        - ~/.npm
+
+# ---------------------------------------------------------------------------
+# Jobs
+# ---------------------------------------------------------------------------
+jobs:
+  # Validates that package.json version and CHANGELOG.md are in sync.
+  check_mergable:
+    working_directory: *workspace
+    docker:
+      - image: cimg/node:20.19
+    steps:
+      - checkout
+      - run:
+          name: Check version consistency
+          command: bash scripts/predeploy/check-version.sh
+
+  # Installs deps, builds the plugin, and lints.
+  build_and_lint:
+    working_directory: *workspace
+    docker:
+      - image: cimg/node:20.19
+    steps:
+      - checkout
+      - *restore_npm_cache
+      - run:
+          name: Install dependencies
+          command: npm ci --no-fund --no-audit
+      - *save_npm_cache
+      - run:
+          name: Build
+          command: npm run build
+      - run:
+          name: Lint
+          command: npm run lint
+
+  # Manual approval gate — a human must approve in the CircleCI UI before
+  # any publish jobs run. Defined as a workflow step (type: approval).
+
+  # Publishes the package to npm.
+  # NPM_TOKEN comes from the frontend-production context.
+  publish_to_npm:
+    working_directory: *workspace
+    docker:
+      - image: cimg/node:20.19
+    steps:
+      - checkout
+      - *restore_npm_cache
+      - run:
+          name: Install dependencies
+          command: npm ci --no-fund --no-audit
+      - run:
+          name: Build
+          command: npm run build
+      - run:
+          name: Publish to npm
+          command: |
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+            npm publish --access public
+
+# ---------------------------------------------------------------------------
+# Workflows
+# ---------------------------------------------------------------------------
+workflows:
+  version: 2
+
+  pipeline:
+    jobs:
+      # Always run on every push
+      - check_mergable
+      - build_and_lint
+
+      # main and deploy/* branches only: require human approval before publishing
+      - hold_for_approval:
+          type: approval
+          requires:
+            - check_mergable
+            - build_and_lint
+          filters:
+            branches:
+              only:
+                - main
+                - /^deploy\/.*/
+
+      # Publish to npm after approval
+      - publish_to_npm:
+          context: frontend-production
+          requires:
+            - hold_for_approval
+          filters:
+            branches:
+              only:
+                - main
+                - /^deploy\/.*/
