@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">capacitor-sdk-example-cap7</string>
+    <string name="title_activity_main">capacitor-sdk-example-cap7</string>
+    <string name="package_name">com.pinwheel.capacitordemo7</string>
+    <string name="custom_url_scheme">com.pinwheel.capacitordemo7</string>
+</resources>

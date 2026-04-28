@@ -1,0 +1,37 @@
+PODS:
+  - Capacitor (6.2.1):
+    - CapacitorCordova
+  - CapacitorCordova (6.2.1)
+  - PinwheelPlugin (0.0.3):
+    - Capacitor
+    - PinwheelSDK (~> 3.5)
+  - PinwheelSDK (3.5.0):
+    - PinwheelSDK/PinwheelLinkSDK (= 3.5.0)
+  - PinwheelSDK/PinwheelLinkSDK (3.5.0)
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "PinwheelPlugin (from `../../node_modules/@pinwheel/capacitor-sdk`)"
+
+SPEC REPOS:
+  trunk:
+    - PinwheelSDK
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  PinwheelPlugin:
+    :path: "../../node_modules/@pinwheel/capacitor-sdk"
+
+SPEC CHECKSUMS:
+  Capacitor: c95400d761e376be9da6be5a05f226c0e865cebf
+  CapacitorCordova: 8d93e14982f440181be7304aa9559ca631d77fff
+  PinwheelPlugin: 38cd8fb624622139d935708dacd35b55a90ed22e
+  PinwheelSDK: ce9d956cf1473296bdeb60e419c90ab525785374
+
+PODFILE CHECKSUM: 7845791d35847fc40c32c8988f552712fa1aa651
+
+COCOAPODS: 1.16.2

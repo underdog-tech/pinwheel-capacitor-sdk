@@ -20,7 +20,6 @@ references:
 # Jobs
 # ---------------------------------------------------------------------------
 jobs:
-
   # Validates that package.json version and CHANGELOG.md are in sync.
   check_mergable:
     working_directory: *workspace
@@ -75,22 +74,6 @@ jobs:
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
             npm publish --access public
 
-  # Copies CHANGELOG.md to the public pinwheel-capacitor-sdk repo,
-  # tags the commit, and creates a GitHub Release.
-  # GITHUB_TOKEN_CTX comes from the frontend-production context.
-  update_public_repo:
-    working_directory: *workspace
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run:
-          name: Install jq
-          command: sudo apt-get update -qq && sudo apt-get install -y -qq jq
-      - run:
-          name: Update public repo, tag, and create GitHub Release
-          command: bash scripts/update-external-repo/main.sh
-
 # ---------------------------------------------------------------------------
 # Workflows
 # ---------------------------------------------------------------------------
@@ -120,17 +103,6 @@ workflows:
           context: frontend-production
           requires:
             - hold_for_approval
-          filters:
-            branches:
-              only:
-                - main
-                - /^deploy\/.*/
-
-      # Update the public repo changelog, tag, and GitHub Release after npm publish
-      - update_public_repo:
-          context: frontend-production
-          requires:
-            - publish_to_npm
           filters:
             branches:
               only:
