@@ -42,7 +42,6 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
         }
 
         val useDarkMode = call.getBoolean("useDarkMode") ?: false
-        val useSecureOrigin = call.getBoolean("useSecureOrigin") ?: false
         // The JS layer always passes the wrapper's `package.json` version via
         // `Pinwheel.open()`. We fall back to `BuildConfig.WRAPPER_VERSION` (read at
         // build time from package.json — see android/build.gradle) so the value
@@ -58,7 +57,7 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
             }
 
             val fragmentManager = activity.supportFragmentManager
-            fragmentManager.popBackStack(FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            dismissFragment()
 
             pinwheelFragment = PinwheelFragment.newInstanceWithAdvancedOptions(
                 token,
@@ -67,8 +66,7 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
                 sdkVersion,
                 null,
                 true,
-                useDarkMode,
-                useSecureOrigin
+                useDarkMode
             ).apply {
                 pinwheelEventListener = this@PinwheelPlugin
             }
@@ -116,13 +114,17 @@ class PinwheelPlugin : Plugin(), PinwheelEventListener {
             fragment.pinwheelEventListener = null
         }
         if (fragmentManager.findFragmentByTag(FRAGMENT_TAG) != null) {
-            fragmentManager.popBackStack(FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            fragmentManager.popBackStackImmediate(FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+        fragmentManager.findFragmentByTag(FRAGMENT_TAG)?.let { fragment ->
+            fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss()
+            fragmentManager.executePendingTransactions()
         }
         pinwheelFragment = null
     }
 
     override fun onEvent(eventName: PinwheelEventType, payload: PinwheelEventPayload?) {
-        val name = eventName.toString()
+        val name = eventName.toString().lowercase()
         val payloadObj = payload?.toJSObject()
 
         val data = JSObject().apply {

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0]
+
+- **Android Capacitor 6/7/8 compatibility**: updated the Android Gradle plugin setup so the wrapper can be consumed by apps across supported Capacitor majors, inherits host app SDK versions when available, and declares AppCompat explicitly for the plugin compile classpath.
+- **Android exit handling**: normalized native event names before forwarding to JavaScript so Android `EXIT` events trigger the wrapper's `exit` listener and dismiss the native Pinwheel fragment instead of leaving a blank screen.
+- **Android native SDK alignment**: removed the obsolete Capacitor `PluginPackage` registration class and aligned the `PinwheelFragment.newInstanceWithAdvancedOptions(...)` call with `pinwheel-android:3.5.2`.
+- **Build notes**: documented Java runtime requirements for Android local builds: use JDK 17 for Capacitor 6/7 and JDK 21+ for Capacitor 8.
+
 ## [0.0.3]
 
 - **Edge native support**: the wrapper now correctly identifies itself to Pinwheel Link and Newton as `sdk: "capacitor"` with the actual wrapper version, enabling edge-native login flows (where the payroll site is loaded in a native WebView controlled by the underlying SDK rather than a browser tab).

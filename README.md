@@ -45,6 +45,11 @@ await Pinwheel.open({
 - If you use camera flows, declare camera permission in your app manifest.
 - This wrapper requires **pinwheel-android >= 3.5.2**, which implements the full
   `PINWHEEL_INTERNAL_COMM_*` postMessage bridge needed for edge-native login flows.
+- Use the Java runtime expected by your Capacitor Android major when building locally:
+  - **Capacitor 6 / 7**: run Gradle with **JDK 17**. Newer runtimes such as JDK 24 can fail
+    during Gradle script analysis with `Unsupported class file major version 68`.
+  - **Capacitor 8**: run Gradle with **JDK 21+** because `@capacitor/android` compiles with
+    Java source release 21.
 
 ## Edge native
 
@@ -55,9 +60,15 @@ wrapper identifies itself to Pinwheel Link as `sdk: "capacitor"` and forwards it
 own `package.json` version as `sdk_version`; Newton uses that pair to gate
 edge-native eligibility.
 
-## Example app
+## Example apps
 
-See [example-app/README.md](example-app/README.md). From the repo root, `npm install && npm run build` the plugin, then in `example-app/` run `npm install && npm run build` and `npx cap add ios android && npx cap sync`.
+The repo includes three local example apps for validating the wrapper against supported Capacitor majors:
+
+- [example-app/README.md](example-app/README.md) — Capacitor 8
+- [example-app-capacitor-7/README.md](example-app-capacitor-7/README.md) — Capacitor 7
+- [example-app-capacitor-6/README.md](example-app-capacitor-6/README.md) — Capacitor 6
+
+From the repo root, `npm install && npm run build` the plugin, then in the example app directory run `npm install && npm run build` and `npx cap sync`.
 
 ## Public GitHub repo (`pinwheel-capacitor-sdk`)
 
