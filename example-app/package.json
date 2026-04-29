@@ -23,7 +23,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "8.0.0",
+    "@capacitor/cli": "^8.3.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react-swc": "^3.7.2",
@@ -31,7 +31,7 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3",
-    "vite": "^5.4.2"
+    "vite": "^6.4.2"
   },
   "author": "Pinwheel",
   "license": "MIT"
