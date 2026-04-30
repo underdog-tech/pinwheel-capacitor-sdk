@@ -1,6 +1,6 @@
 {
   "name": "@pinwheel/capacitor-sdk",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "description": "Capacitor plugin wrapping the Pinwheel native SDKs (supports Capacitor 6, 7, and 8)",
   "type": "module",
   "main": "dist/cjs/index.js",

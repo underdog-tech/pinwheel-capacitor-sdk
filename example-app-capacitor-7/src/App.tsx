@@ -1,13 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Pinwheel } from '@pinwheel/capacitor-sdk';
 import type {
-  PinwheelEvent,
-  PinwheelLoginAttemptPayload,
-  PinwheelLoginPayload,
   PinwheelOpenOptions,
-  PinwheelError,
-  PinwheelSuccessPayload,
 } from '@pinwheel/capacitor-sdk';
 
 const defaultLinkTokenRequestBody = {
@@ -173,85 +168,6 @@ export function App() {
   const [token, setToken] = useState('');
   const [useDarkMode, setUseDarkMode] = useState(false);
   const [useSecureOrigin, setUseSecureOrigin] = useState(false);
-
-  // Edge-native smoke test state — see "Edge native smoke test" in README. We track
-  // each event the underlying native SDK is supposed to fire while running through
-  // an edge-native flow so a developer can tell at a glance whether the bridge is
-  // wired correctly. The default `platformId` is overridable per dev environment so
-  // we don't pin a specific test fixture into source.
-  type EdgeSmokeStatus = 'idle' | 'creating-token' | 'opened' | 'pass' | 'fail';
-  const defaultEdgeSmokePlatformId =
-    (import.meta.env.VITE_EDGE_SMOKE_PLATFORM_ID as string | undefined) ?? '';
-  const [edgeSmokePlatformId, setEdgeSmokePlatformId] = useState(defaultEdgeSmokePlatformId);
-  const [edgeSmokeStatus, setEdgeSmokeStatus] = useState<EdgeSmokeStatus>('idle');
-  const [edgeSmokeLog, setEdgeSmokeLog] = useState<string[]>([]);
-  const appendEdgeSmokeLog = useCallback((line: string) => {
-    setEdgeSmokeLog((prev) => [...prev, `${nowIso()} ${line}`]);
-  }, []);
-
-  useEffect(() => {
-    const handles: Array<{ remove: () => Promise<void> }> = [];
-    (async () => {
-      // During Vite HMR / Fast Refresh, the JS runtime can reload without the native
-      // plugin being torn down. Clear listeners to avoid stale/no-op subscriptions.
-      await Pinwheel.removeAllListeners().catch(() => undefined);
-
-      handles.push(
-        await Pinwheel.addListener('event', (evt: PinwheelEvent) => {
-          appendLog(`[event] ${evt?.name} payload=${safeStringify(evt?.payload)}`);
-          if (evt?.name) {
-            appendEdgeSmokeLog(`event:${evt.name}`);
-          }
-        }),
-      );
-      handles.push(
-        await Pinwheel.addListener('success', (payload: PinwheelSuccessPayload) => {
-          appendLog(`[success] ${safeStringify(payload)}`);
-          appendEdgeSmokeLog('success');
-          setEdgeSmokeStatus((prev) => (prev === 'idle' ? prev : 'pass'));
-        }),
-      );
-      handles.push(
-        await Pinwheel.addListener('exit', (payload?: PinwheelError) => {
-          appendLog(`[exit] ${safeStringify(payload)}`);
-          appendEdgeSmokeLog('exit');
-          // If the user dismisses before success fires, mark the smoke test as fail.
-          setEdgeSmokeStatus((prev) =>
-            prev === 'opened' || prev === 'creating-token' ? 'fail' : prev,
-          );
-        }),
-      );
-      handles.push(
-        await Pinwheel.addListener('error', (payload: PinwheelError) => {
-          appendLog(`[error] ${safeStringify(payload)}`);
-          appendEdgeSmokeLog('error');
-          setEdgeSmokeStatus((prev) => (prev === 'idle' ? prev : 'fail'));
-        }),
-      );
-      handles.push(
-        await Pinwheel.addListener('login', (payload: PinwheelLoginPayload) => {
-          appendLog(`[login] ${safeStringify(payload)}`);
-        }),
-      );
-      handles.push(
-        await Pinwheel.addListener(
-          'loginAttempt',
-          (payload: PinwheelLoginAttemptPayload) => {
-            appendLog(`[loginAttempt] ${safeStringify(payload)}`);
-          },
-        ),
-      );
-    })().catch((e) => {
-      appendLog(`[listeners] failed to register: ${String(e?.message || e)}`);
-    });
-
-    return () => {
-      // Best-effort cleanup in dev reloads.
-      void (async () => {
-        await Promise.all(handles.map((h) => h.remove().catch(() => undefined)));
-      })();
-    };
-  }, [appendLog, appendEdgeSmokeLog]);
 
   const builtRequestBodyFromForm = useMemo(() => {
     const body: Record<string, unknown> = {
@@ -435,100 +351,6 @@ export function App() {
 
   const onClearLog = useCallback(() => setLogLines([]), []);
 
-  const onRunEdgeSmokeTest = useCallback(async () => {
-    if (!apiKey.trim()) {
-      appendLog('[edge-smoke] missing API key');
-      return;
-    }
-    if (!edgeSmokePlatformId.trim()) {
-      appendLog(
-        '[edge-smoke] missing platform_id. Pre-fill via VITE_EDGE_SMOKE_PLATFORM_ID or paste a known edge-native platform_id.',
-      );
-      return;
-    }
-
-    setEdgeSmokeStatus('creating-token');
-    setEdgeSmokeLog([`${nowIso()} starting smoke test for platform_id=${edgeSmokePlatformId.trim()}`]);
-
-    const requestBody = {
-      ...builtRequestBodyFromForm,
-      platform_id: edgeSmokePlatformId.trim(),
-    };
-
-    let resp: Response;
-    try {
-      resp = await fetch(`${pinwheelSandboxApiBaseUrl}/link_tokens`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-SECRET': apiKey.trim(),
-          'Pinwheel-Version': pinwheelVersion.trim(),
-        },
-        body: JSON.stringify(requestBody),
-      });
-    } catch (e) {
-      const msg = String((e as Error)?.message || e);
-      appendLog(`[edge-smoke] request failed: ${msg}`);
-      appendEdgeSmokeLog(`token request failed: ${msg}`);
-      setEdgeSmokeStatus('fail');
-      return;
-    }
-
-    const text = await resp.text();
-    let json: any;
-    try {
-      json = JSON.parse(text);
-    } catch {
-      json = { raw: text };
-    }
-
-    if (!resp.ok) {
-      appendLog(`[edge-smoke] token API status=${resp.status} body=${safeStringify(json)}`);
-      appendEdgeSmokeLog(`token API status=${resp.status}`);
-      setEdgeSmokeStatus('fail');
-      return;
-    }
-
-    const createdToken: string | undefined = json?.data?.token ?? json?.token;
-    if (!createdToken || typeof createdToken !== 'string') {
-      appendLog(`[edge-smoke] no token in response: ${safeStringify(json)}`);
-      setEdgeSmokeStatus('fail');
-      return;
-    }
-
-    setToken(createdToken);
-    appendEdgeSmokeLog('token created');
-
-    try {
-      await Pinwheel.open({
-        linkToken: createdToken,
-        useDarkMode,
-        useSecureOrigin,
-      });
-      setEdgeSmokeStatus('opened');
-      appendEdgeSmokeLog('Pinwheel.open() resolved');
-    } catch (e) {
-      const msg = String((e as Error)?.message || e);
-      appendLog(`[edge-smoke] open failed: ${msg}`);
-      appendEdgeSmokeLog(`open failed: ${msg}`);
-      setEdgeSmokeStatus('fail');
-    }
-  }, [
-    apiKey,
-    appendEdgeSmokeLog,
-    appendLog,
-    builtRequestBodyFromForm,
-    edgeSmokePlatformId,
-    pinwheelSandboxApiBaseUrl,
-    pinwheelVersion,
-    useDarkMode,
-    useSecureOrigin,
-  ]);
-
-  const onResetEdgeSmokeTest = useCallback(() => {
-    setEdgeSmokeStatus('idle');
-    setEdgeSmokeLog([]);
-  }, []);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 antialiased">
@@ -878,75 +700,7 @@ export function App() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-xl border border-slate-800 bg-slate-900/40 p-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-100">Edge native smoke test</h2>
-            <span
-              className={
-                edgeSmokeStatus === 'pass'
-                  ? 'rounded-full bg-emerald-900/60 px-3 py-1 text-xs font-medium text-emerald-200'
-                  : edgeSmokeStatus === 'fail'
-                    ? 'rounded-full bg-rose-900/60 px-3 py-1 text-xs font-medium text-rose-200'
-                    : edgeSmokeStatus === 'idle'
-                      ? 'rounded-full bg-slate-800/80 px-3 py-1 text-xs font-medium text-slate-300'
-                      : 'rounded-full bg-amber-900/60 px-3 py-1 text-xs font-medium text-amber-200'
-              }
-            >
-              {edgeSmokeStatus === 'idle'
-                ? 'idle'
-                : edgeSmokeStatus === 'creating-token'
-                  ? 'creating token…'
-                  : edgeSmokeStatus === 'opened'
-                    ? 'native modal open — waiting for success'
-                    : edgeSmokeStatus === 'pass'
-                      ? 'PASS'
-                      : 'FAIL'}
-            </span>
-          </div>
-          <div className="grid gap-4">
-            <p className="text-xs text-slate-400">
-              Creates a link token preset to a known edge-native platform, opens the native
-              modal, and watches for a <code className="text-slate-300">success</code> event.
-              Use this to confirm end-to-end that Newton returns{' '}
-              <code className="text-slate-300">edge_native</code> for{' '}
-              <code className="text-slate-300">sdk=&quot;capacitor&quot;</code> and the underlying
-              native SDK&apos;s <code className="text-slate-300">PINWHEEL_INTERNAL_COMM_*</code>{' '}
-              bridge handles the flow.
-            </p>
-            <TextInput
-              id="edgeSmokePlatformId"
-              label="platform_id (edge-native fixture)"
-              value={edgeSmokePlatformId}
-              placeholder="e.g. an EDGE_ONLY_PLATFORMS member's platform_id"
-              helperText="Pre-fill via VITE_EDGE_SMOKE_PLATFORM_ID. The platform must be in Newton's EDGE_ONLY_PLATFORMS list (e.g. firstNationalBank, doorDash, etc.)."
-              onChange={setEdgeSmokePlatformId}
-            />
-            <div className="flex flex-wrap gap-3">
-              <Button variant="primary" onClick={onRunEdgeSmokeTest}>
-                Run smoke test
-              </Button>
-              <Button variant="secondary" onClick={onResetEdgeSmokeTest}>
-                Reset
-              </Button>
-            </div>
-            <div>
-              <label
-                htmlFor="edgeSmokeLog"
-                className="block text-sm font-medium text-slate-200"
-              >
-                Smoke test trace
-              </label>
-              <textarea
-                id="edgeSmokeLog"
-                rows={6}
-                readOnly
-                value={edgeSmokeLog.join('\n')}
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-                placeholder="Smoke test events will appear here…"
-              />
-            </div>
-          </div>
-        </section>
+
       </main>
     </div>
   );
