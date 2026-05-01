@@ -8,11 +8,10 @@ const RawPinwheel = registerPlugin<PinwheelPlugin>('Pinwheel', {
   web: () => new PinwheelWeb(),
 });
 
-// Pinwheel Link and Newton key edge-native eligibility / version gates off of the
-// `sdk` + `sdk_version` headers. Always forward the bundled wrapper version
-// (sourced from package.json via scripts/write-version.mjs) so the value Newton
-// sees stays in sync with whatever Capacitor wrapper is published, even if the
-// caller forgets to pass `sdkVersion`. A caller-supplied value still wins.
+// Always forward the bundled wrapper version (sourced from package.json via
+// scripts/write-version.mjs) so Pinwheel Link receives the published Capacitor
+// wrapper version even if the caller forgets to pass `sdkVersion`.
+// A caller-supplied value still wins.
 const open = (options: PinwheelOpenOptions): Promise<void> =>
   RawPinwheel.open({
     sdkVersion: PINWHEEL_CAPACITOR_WRAPPER_VERSION,

@@ -52,10 +52,6 @@ repositories {
 }
 
 dependencies {
-    // pinwheel-android >= 3.5.2 implements the full PINWHEEL_INTERNAL_COMM_*
-    // edge-native postMessage bridge required by Pinwheel Link. Earlier versions are
-    // missing some event handlers (storage_get/_set, homer_open, auth_request) and
-    // would silently break edge-native flows.
     implementation 'com.getpinwheel:pinwheel-android:3.5.2'
     implementation project(':capacitor-android')
     implementation 'androidx.appcompat:appcompat:1.7.1'

@@ -36,7 +36,6 @@ await Pinwheel.open({
 ## iOS Notes
 
 - Add `NSCameraUsageDescription` if you use flows that require camera access.
-- If you load non-HTTPS content (not recommended), configure ATS accordingly.
 - This wrapper requires **PinwheelSDK >= 3.5.0**.
 
 ## Android Notes
@@ -53,8 +52,8 @@ await Pinwheel.open({
 
 The repo includes three local example apps for validating the wrapper against supported Capacitor majors:
 
-- [example-app/README.md](example-app/README.md) — Capacitor 8
-- [example-app-capacitor-7/README.md](example-app-capacitor-7/README.md) — Capacitor 7
-- [example-app-capacitor-6/README.md](example-app-capacitor-6/README.md) — Capacitor 6
+- [https://github.com/underdog-tech/pinwheel-capacitor-sdk/tree/main/example-app](example-app) — Capacitor 8
+- [https://github.com/underdog-tech/pinwheel-capacitor-sdk/tree/main/example-app-capacitor-7](example-app-capacitor-7) — Capacitor 7
+- [https://github.com/underdog-tech/pinwheel-capacitor-sdk/tree/main/example-app-capacitor-6](example-app-capacitor-6) — Capacitor 6
 
 From the repo root, `npm install && npm run build` the plugin, then in the example app directory run `npm install && npm run build` and `npx cap sync`.

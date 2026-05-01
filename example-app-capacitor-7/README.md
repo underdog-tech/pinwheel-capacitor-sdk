@@ -43,7 +43,6 @@ The key pre-fills the **API key** field in the UI. It is stored only in memory a
 |---|---|---|
 | `VITE_PINWHEEL_API_KEY` | _(empty)_ | Pre-fills the API key field in the UI |
 | `VITE_PINWHEEL_API_BASE_URL` | `https://api.getpinwheel.com/v1` | API base URL — set to `https://sandbox.getpinwheel.com/v1` to run against sandbox |
-| `VITE_EDGE_SMOKE_PLATFORM_ID` | _(empty)_ | Pre-fills the **platform_id** in the **Edge native smoke test** panel |
 
 **4. Build the web assets and sync to native**
 
@@ -97,13 +96,12 @@ Then run `npm run start` and sync (`npx cap sync`). The native app will load fro
 
 ## What the app does
 
-The example UI has three sections:
+The example UI has two sections:
 
 1. **Create Link Token** — fills in the direct deposit switch defaults (org `test`, a fixed `end_user_id`, and a pre-populated `allocation` target). Hit **Create token** to call `POST /v1/link_tokens` using your API key. The returned token is automatically copied into the launch section.
 
 2. **Launch** — paste or auto-fill a link token and tap **Open** to open the native Pinwheel modal. All SDK events (`event`, `success`, `exit`, `error`, `login`, `loginAttempt`) are printed to the on-screen event log.
 
-3. **Edge native smoke test** — creates a link token pre-selected to a known edge-native platform (configured via `VITE_EDGE_SMOKE_PLATFORM_ID` or the in-UI input), opens Pinwheel, and watches for a `success` event to verify the end-to-end edge-native flow. Status badge transitions: `idle` → `creating token…` → `native modal open — waiting for success` → `PASS` (success fired) or `FAIL` (exit/error before success). DD-form download flows are part of edge-native success on payroll-aware platforms — use the same panel on iOS and Android to verify both `PINWHEEL_DOWNLOAD_EVENT` (legacy blob) and `PINWHEEL_URL_DOWNLOAD_EVENT` (Android URL) paths.
 
 ## Default request body
 
