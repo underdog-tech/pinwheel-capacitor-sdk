@@ -13,6 +13,6 @@ Pod::Spec.new do |s|
   s.source_files = 'ios/Sources/**/*.{swift,h,m,mm}'
   s.ios.deployment_target = '15.0'
   s.dependency 'Capacitor'
-  s.dependency 'PinwheelSDK', '~> 3.5'
+  s.dependency 'PinwheelSDK', '4.0.0'
   s.swift_version = '5.1'
 end

@@ -36,12 +36,12 @@ await Pinwheel.open({
 ## iOS Notes
 
 - Add `NSCameraUsageDescription` if you use flows that require camera access.
-- This wrapper requires **PinwheelSDK >= 3.5.0**.
+- This wrapper requires **PinwheelSDK >= 4.0.0**.
 
 ## Android Notes
 
 - If you use camera flows, declare camera permission in your app manifest.
-- This wrapper requires **pinwheel-android >= 3.5.2**.
+- This wrapper requires **pinwheel-android >= 4.0.0**.
 - Use the Java runtime expected by your Capacitor Android major when building locally:
   - **Capacitor 6 / 7**: run Gradle with **JDK 17**. Newer runtimes such as JDK 24 can fail
     during Gradle script analysis with `Unsupported class file major version 68`.

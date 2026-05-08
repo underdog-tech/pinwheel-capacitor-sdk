@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.getpinwheel:pinwheel-android:3.5.2'
+    implementation 'com.getpinwheel:pinwheel-android:4.0.0'
     implementation project(':capacitor-android')
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.fragment:fragment-ktx:1.7.1'

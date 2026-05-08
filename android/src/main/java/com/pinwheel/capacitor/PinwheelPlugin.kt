@@ -12,7 +12,10 @@ import com.pinwheel.capacitor.BuildConfig
 import com.underdog_tech.pinwheel_android.PinwheelEventListener
 import com.underdog_tech.pinwheel_android.PinwheelFragment
 import com.underdog_tech.pinwheel_android.model.PinwheelAllocation
+import com.underdog_tech.pinwheel_android.model.PinwheelBillEventPayload
 import com.underdog_tech.pinwheel_android.model.PinwheelBillSwitchEventPayload
+import com.underdog_tech.pinwheel_android.model.PinwheelBillSwitchPlatformsAddedEventPayload
+import com.underdog_tech.pinwheel_android.model.PinwheelCalendarSyncEventPayload
 import com.underdog_tech.pinwheel_android.model.PinwheelDDFormCreatePayload
 import com.underdog_tech.pinwheel_android.model.PinwheelError
 import com.underdog_tech.pinwheel_android.model.PinwheelEventPayload
@@ -28,6 +31,7 @@ import com.underdog_tech.pinwheel_android.model.PinwheelScreenTransitionPayload
 import com.underdog_tech.pinwheel_android.model.PinwheelSelectedEmployerPayload
 import com.underdog_tech.pinwheel_android.model.PinwheelSelectedPlatformPayload
 import com.underdog_tech.pinwheel_android.model.PinwheelTarget
+import com.underdog_tech.pinwheel_android.model.PinwheelUserActivatedEventPayload
 
 @CapacitorPlugin(name = "Pinwheel")
 class PinwheelPlugin : Plugin(), PinwheelEventListener {
@@ -254,6 +258,32 @@ private fun PinwheelEventPayload.toJSObject(): JSObject = when (this) {
         put("frequency", this@toJSObject.frequency)
         put("nextPaymentDate", this@toJSObject.nextPaymentDate)
         put("amountCents", this@toJSObject.amountCents)
+        this@toJSObject.accountId?.let { put("accountId", it) }
+    }
+
+    is PinwheelBillEventPayload -> JSObject().apply {
+        put("platformId", this@toJSObject.platformId)
+        put("platformName", this@toJSObject.platformName)
+        put("frequency", this@toJSObject.frequency)
+        put("nextPaymentDate", this@toJSObject.nextPaymentDate)
+        put("amountCents", this@toJSObject.amountCents)
+    }
+
+    is PinwheelBillSwitchPlatformsAddedEventPayload -> JSObject().apply {
+        put("platforms", this@toJSObject.platforms.map { platform ->
+            JSObject().apply {
+                put("id", platform.id)
+                put("name", platform.name)
+            }
+        })
+    }
+
+    is PinwheelCalendarSyncEventPayload -> JSObject().apply {
+        put("calendarType", this@toJSObject.calendarType.name.lowercase())
+    }
+
+    is PinwheelUserActivatedEventPayload -> JSObject().apply {
+        put("solutionName", this@toJSObject.solutionName)
     }
 
     is PinwheelExternalAccountConnectedPayload -> JSObject().apply {
