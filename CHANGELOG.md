@@ -2,8 +2,32 @@
 
 ## [4.0.0]
 
-- Update native iOS and Android Pinwheel SDK dependencies to 4.0.0.
-- Add TypeScript and Android bridge support for the new Bill Switch, calendar sync, customer terms, and user activation events.
+#### Notes
+
+- Upgrades the SDK to target the latest verison of Link: v4.
+- Adds support for a new set of bill and account lifecycle events.
+
+#### Breaking Changes
+
+- The `billRemoved` event handler now uses `PinwheelBillEvent` instead of `PinwheelBillSwitchEvent`.
+
+#### Non-breaking Changes
+
+- An optional `accountId` field has been added to `PinwheelBillSwitchPayload`.
+
+#### New event types
+
+- `billSwitchFailure`
+- `billAdded`
+- `billEdited`
+- `billMarkedInactive`
+- `billSwitchPlatformsAdded`
+- `billSwitchPlatformsRemoved`
+- `billCancelSuccess`
+- `billCancelFailure`
+- `calendarSync`
+- `customerTermsAccepted`
+- `userActivated`
 
 ## [3.0.0]
 
