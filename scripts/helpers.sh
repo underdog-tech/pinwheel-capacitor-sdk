@@ -12,7 +12,7 @@ function get_hash () {
 }
 
 function get_repo_owner () {
-  echo "${PUBLIC_REPO_OWNER:-pinwheel-hq}"
+  echo "${PUBLIC_REPO_OWNER:-underdog-tech}"
 }
 
 function get_repo_name () {

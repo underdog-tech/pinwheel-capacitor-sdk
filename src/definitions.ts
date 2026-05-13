@@ -60,7 +60,18 @@ export type PinwheelEventName =
   | 'other_event'
   | 'external_account_connected'
   | 'bill_switch_success'
+  | 'bill_switch_failure'
   | 'bill_removed'
+  | 'bill_added'
+  | 'bill_edited'
+  | 'bill_marked_inactive'
+  | 'bill_switch_platforms_added'
+  | 'bill_switch_platforms_removed'
+  | 'bill_cancel_success'
+  | 'bill_cancel_failure'
+  | 'calendar_sync'
+  | 'customer_terms_accepted'
+  | 'user_activated'
   | 'merchant_login_success';
 
 export interface PinwheelTarget {
@@ -142,13 +153,39 @@ export interface PinwheelOtherEventPayload {
   payload: PinwheelOtherEventPayloadItem[];
 }
 
-export interface PinwheelBillSwitchSuccessPayload {
+export interface PinwheelBillSwitchPayload {
   platformId: string;
   platformName: string;
   isIntegratedSwitch: boolean;
   frequency: string;
   nextPaymentDate: string;
   amountCents: number;
+  accountId?: string;
+}
+
+export interface PinwheelBillPayload {
+  platformId: string;
+  platformName: string;
+  frequency: string;
+  nextPaymentDate: string;
+  amountCents: number;
+}
+
+export interface PinwheelBillSwitchPlatform {
+  id: string;
+  name: string;
+}
+
+export interface PinwheelBillSwitchPlatformsPayload {
+  platforms: PinwheelBillSwitchPlatform[];
+}
+
+export interface PinwheelCalendarSyncPayload {
+  calendarType: 'google' | 'outlook';
+}
+
+export interface PinwheelUserActivatedPayload {
+  solutionName: string;
 }
 
 export interface PinwheelExternalAccountConnectedPayload {
@@ -175,9 +212,20 @@ export type PinwheelEventPayloadByName = {
   error: PinwheelError;
   other_event: PinwheelOtherEventPayload;
   external_account_connected: PinwheelExternalAccountConnectedPayload;
-  bill_switch_success: PinwheelBillSwitchSuccessPayload;
-  bill_removed: unknown;
-  merchant_login_success: unknown;
+  bill_switch_success: PinwheelBillSwitchPayload;
+  bill_switch_failure: PinwheelBillSwitchPayload;
+  bill_removed: PinwheelBillPayload;
+  bill_added: PinwheelBillPayload;
+  bill_edited: PinwheelBillPayload;
+  bill_marked_inactive: PinwheelBillPayload;
+  bill_switch_platforms_added: PinwheelBillSwitchPlatformsPayload;
+  bill_switch_platforms_removed: PinwheelBillSwitchPlatformsPayload;
+  bill_cancel_success: PinwheelBillSwitchPayload;
+  bill_cancel_failure: PinwheelBillSwitchPayload;
+  calendar_sync: PinwheelCalendarSyncPayload;
+  customer_terms_accepted: undefined;
+  user_activated: PinwheelUserActivatedPayload;
+  merchant_login_success: PinwheelLoginPayload;
 };
 
 export interface PinwheelEvent<Name extends PinwheelEventName = PinwheelEventName> {

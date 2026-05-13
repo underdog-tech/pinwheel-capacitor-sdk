@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", "6.0.0" ..< "9.0.0"),
-        .package(url: "https://github.com/underdog-tech/pinwheel-ios-sdk", from: "3.0.0")
+        .package(url: "https://github.com/underdog-tech/pinwheel-ios-sdk", from: "4.0.0")
     ],
     targets: [
         .target(
