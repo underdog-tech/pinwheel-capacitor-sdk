@@ -10,6 +10,10 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchAutoHide: false,
     },
+    // Route fetch/XHR through native HTTP on iOS/Android (avoids WKWebView CORS blocks).
+    CapacitorHttp: {
+      enabled: true,
+    },
   },
   ...(serverUrl
     ? {

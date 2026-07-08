@@ -334,10 +334,21 @@ export function App() {
       linkToken: token,
       useDarkMode,
       useSecureOrigin,
+      mode:"production",
+      environment:"production",
     };
     appendLog(`[open] useDarkMode=${useDarkMode} useSecureOrigin=${useSecureOrigin}`);
     try {
       await Pinwheel.open(options);
+      Pinwheel.addListener('event', (event) => {
+        appendLog(`[open] event: ${event.name}`);
+      });
+      Pinwheel.addListener('error', (error) => {
+        appendLog(`[open] error: ${error.message}`);
+      });
+      Pinwheel.addListener('exit', () => {
+        appendLog('[open] native modal closed');
+      });
       appendLog('[open] native modal presented');
     } catch (e) {
       appendLog(`[open] failed: ${String((e as Error)?.message || e)}`);
