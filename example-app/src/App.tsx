@@ -137,12 +137,12 @@ export function App() {
 
   const makeId = useCallback(() => Math.random().toString(36).slice(2), []);
 
-  const pinwheelSandboxApiBaseUrl =
-    (import.meta.env.VITE_PINWHEEL_API_BASE_URL as string | undefined) ?? 'https://api.getpinwheel.com/v1';
+  const pinwheelSandboxApiBaseUrl = "https://sandbox.getpinwheel.com/v1"
 
   // Link token creator state
   
   const [apiKey, setApiKey] = useState(import.meta.env.VITE_PINWHEEL_API_KEY as string);
+  console.log({apiKey, pinwheelSandboxApiBaseUrl})
   const [pinwheelVersion, setPinwheelVersion] = useState('2025-07-08');
   const [orgName, setOrgName] = useState('test');
   const [solution, setSolution] = useState('Deposit Switch');
@@ -332,10 +332,12 @@ export function App() {
     }
     const options: PinwheelOpenOptions = {
       linkToken: token,
-      useDarkMode,
-      useSecureOrigin,
+      mode: 'sandbox',
+      environment: 'production',
     };
-    appendLog(`[open] useDarkMode=${useDarkMode} useSecureOrigin=${useSecureOrigin}`);
+    appendLog(
+      `[open] mode=sandbox environment=production useDarkMode=${useDarkMode} useSecureOrigin=${useSecureOrigin}`,
+    );
     try {
       await Pinwheel.open(options);
       appendLog('[open] native modal presented');

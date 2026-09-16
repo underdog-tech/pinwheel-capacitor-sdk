@@ -19,6 +19,7 @@
     "android/",
     "ios/",
     "Package.swift",
+    "PinwheelCapacitorSdk.podspec",
     "PinwheelPlugin.podspec",
     "README.md",
     "LICENSE"
