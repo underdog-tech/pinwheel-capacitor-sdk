@@ -17,7 +17,7 @@
   "dependencies": {
     "@capacitor/android": "^7.0.0",
     "@capacitor/core": "^7.0.0",
-    "@capacitor/ios": "^7.0.0",
+    "@capacitor/ios": "^7.6.9",
     "@pinwheel/capacitor-sdk": "file:..",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
