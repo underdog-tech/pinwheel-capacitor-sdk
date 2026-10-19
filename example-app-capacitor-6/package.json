@@ -15,9 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/android": "^6.0.0",
+    "@capacitor/android": "^6.2.2",
     "@capacitor/core": "^6.0.0",
-    "@capacitor/ios": "^6.0.0",
+    "@capacitor/ios": "^6.2.2",
     "@pinwheel/capacitor-sdk": "file:..",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
