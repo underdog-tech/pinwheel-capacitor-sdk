@@ -30,7 +30,6 @@ type FeatureName =
   | 'paystubs'
   | 'paycheck_viewer'
   | 'bill_switch'
-  | 'bill_manager'
   | 'bill_cancellation';
 
 const featureOptions: FeatureName[] = [
@@ -41,7 +40,6 @@ const featureOptions: FeatureName[] = [
   'paystubs',
   'paycheck_viewer',
   'bill_switch',
-  'bill_manager',
   'bill_cancellation'
 ];
 
