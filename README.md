@@ -5,8 +5,11 @@ Capacitor plugin that opens Pinwheel Link natively on iOS and Android and forwar
 ## Install
 
 ```sh
-npm i @pinwheel/capacitor-sdk
-npx cap sync
+cd example-app
+npm i
+npm run build
+npx cap sync ios
+npx cap run ios // runs the simulator
 ```
 
 ## Usage

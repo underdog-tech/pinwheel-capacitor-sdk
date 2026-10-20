@@ -28,7 +28,9 @@ type FeatureName =
   | 'identity'
   | 'employment'
   | 'paystubs'
-  | 'paycheck_viewer';
+  | 'paycheck_viewer'
+  | 'bill_switch'
+  | 'bill_cancellation';
 
 const featureOptions: FeatureName[] = [
   'direct_deposit_switch',
@@ -37,6 +39,8 @@ const featureOptions: FeatureName[] = [
   'employment',
   'paystubs',
   'paycheck_viewer',
+  'bill_switch',
+  'bill_cancellation'
 ];
 
 type AllocationAccountType = 'checking' | 'savings';
