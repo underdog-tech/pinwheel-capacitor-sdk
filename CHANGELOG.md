@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.1.0]
+
+#### Notes
+
+- Removes DataDog from the SDK, reducing bundle size.
+
 ## [4.0.0]
 
 #### Notes
