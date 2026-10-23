@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0]
+
+#### Notes
+
+- Updates the wrapped native SDKs to Pinwheel iOS 4.1.0 and Pinwheel Android 4.2.0.
+- Those native releases provide Pinwheel's custom logging and crash monitoring. Datadog is no longer included.
+
 ## [4.0.0]
 
 #### Notes
