@@ -86,5 +86,10 @@
     "*.{css,html,js,mjs}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
   }
 }
